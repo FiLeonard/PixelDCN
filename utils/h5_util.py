@@ -1,6 +1,6 @@
 import numpy as np
 import h5py
-from progressbar import ProgressBar
+#from progressbar import ProgressBar
 from PIL import Image
 
 """
@@ -30,27 +30,27 @@ def build_h5_dataset(data_dir, list_path, out_dir, shape, name, norm=False):
     images = read_images(list_path)
     images_size = len(images)
     dataset = h5py.File(out_dir+name+'.h5', 'w')
-    dataset.create_dataset('X', (images_size, shape[1], shape[0], 3), dtype='f')
-    dataset.create_dataset('Y', (images_size, shape[1], shape[0]), dtype='f')
-    pbar = ProgressBar()
-    for index, (image, label) in pbar(enumerate(images)):
+    dataset.create_dataset('X', (images_size, *shape), dtype='f')
+    dataset.create_dataset('Y', (images_size, *shape), dtype='f')
+    #pbar = ProgressBar()
+    for index, (image, label) in enumerate(images):
         image = process_image(data_dir+image, shape)
         label = process_image(data_dir+label, shape, Image.NEAREST)
-        image -= IMG_MEAN
+        #image -= IMG_MEAN
         image = image / 255. if norm else image
         dataset['X'][index], dataset['Y'][index] = image, label
     dataset.close()
 
 
 if __name__ == '__main__':
-    shape = (256, 256)
-    data_dir = './dataset'
-    list_dir = './dataset/'
-    output_dir = './dataset/'
+    shape = (960, 640)
+    data_dir = '../cars/'
+    list_dir = '../cars/'
+    output_dir = '../cars/'
 
     data_files = {
-        'training': 'train.txt',
         'validation': 'val.txt',
+        'training': 'train.txt',
         'testing': 'test.txt'
     }
     for name, list_path in data_files.items():

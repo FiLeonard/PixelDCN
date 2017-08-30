@@ -44,6 +44,9 @@ def imsave(image, path):
             if k < 21:
                 images[j_, k_] = label_colours[int(k)]
     scipy.misc.imsave(path, images)
+    
+def imkeysave(image, path):     
+    scipy.misc.imsave(path, image)
 
 
 def get_images(paths, pre_height, pre_width, height, width,

@@ -5,7 +5,10 @@ import tensorflow as tf
 import numpy as np
 from .img_utils import get_images
 
-
+#import scipy
+#import scipy.misc
+#import cv2
+from PIL import Image
 """
 This module provides three data reader: directly from file, from h5 database, use channel
 
@@ -33,34 +36,35 @@ class FileDataReader(object):
 
 class H5DataLoader(object):
 
-    def __init__(self, data_path, is_train=True):
-        self.is_train = is_train
+    def __init__(self, data_path, mode="train"):
+        self.mode = mode
         data_file = h5py.File(data_path, 'r')
-        self.images, self.labels = data_file['X'], data_file['Y']
+        if mode == "predict" :
+            self.images, self.names = data_file['X'], data_file['NAME']          
+        else:
+            self.images, self.labels = data_file['X'], data_file['Y']
         self.gen_indexes()
 
     def gen_indexes(self):
-        if self.is_train:
+        if self.mode == "train":
             self.indexes = np.random.permutation(range(self.images.shape[0]))
         else:
             self.indexes = np.array(range(self.images.shape[0]))
         self.cur_index = 0
 
-    def next_batch(self, batch_size):
+    def next_batch(self, batch_size = 1):
         next_index = self.cur_index+batch_size
         cur_indexes = list(self.indexes[self.cur_index:next_index])
         self.cur_index = next_index
-        if len(cur_indexes) < batch_size and self.is_train:
+        if len(cur_indexes) < batch_size and self.mode == "train":
             self.gen_indexes()
             return self.next_batch(batch_size)
         cur_indexes.sort()
-        
         if len(cur_indexes) :
             return self.images[cur_indexes], self.names[cur_indexes]
         else:
             self.cur_index = 0
             return  np.empty(0),  np.empty(0)
-
 
 class H53DDataLoader(object):
 
@@ -91,6 +95,71 @@ class H53DDataLoader(object):
         labels = np.transpose(labels, (0, 3, 1, 2))
         return images, labels
 
+class ImageDataListReader(object):
+
+    def __init__(self, data_path, file_name, is_shuffled=True, with_masks=True):
+        self.data = []
+        self.with_masks = with_masks
+        self.is_shuffled = is_shuffled
+        self.data_path = data_path
+        with open(''.join([data_path, file_name]), 'r') as f:
+            for i,(line) in enumerate(f): 
+                self.data.append(line.strip("\n").split(' '))
+                 
+        print("Number of files used: %s" % len(self.data))
+        self.idx = -1
+        if self.is_shuffled:
+            np.random.shuffle(self.data)
+    
+    def load_file(self, path, color = True, dtype=np.float32):
+        
+        ''' cv2
+        img = cv2.imread(path)
+        if img.shape[2] == 3:
+            img = img[...,::-1]
+        '''
+        img = Image.open(path)
+        ''' scipy
+        if color == True:
+            img = scipy.misc.imread(path)
+        else:
+            img = scipy.misc.imread(path, mode='L')
+        '''
+        img = self.preprocess(img)
+        return np.asarray(img, dtype=dtype)
+        
+    def preprocess(self, img):
+        '''
+        img = scipy.misc.imresize(img,(768,1152))
+        '''
+        img = img.resize((1152,768))
+        return img
+
+    def cylce_file(self):
+        self.idx += 1
+        if self.idx >= len(self.data): 
+            if self.is_shuffled:
+                self.idx = 0
+                np.random.shuffle(self.data)
+            else:
+                self.idx = -1
+        
+    def next_batch(self, batch_size = 1):
+        img = []
+        label = []
+        for i in range(batch_size):
+            self.cylce_file()
+            if self.idx < 0:
+                if i == 0:
+                    return  np.empty(0),  np.empty(0)
+                else:
+                    break
+            img.append(self.load_file(''.join([ self.data_path, self.data[self.idx][0] ]), dtype=np.float32))
+            if self.with_masks:
+                label.append(self.load_file(''.join([ self.data_path, self.data[self.idx][1] ]),color=False, dtype=np.float32))
+            else:
+                label.append(self.data[self.idx][0])
+        return np.stack(img), np.stack(label)
 
 class QueueDataReader(object):
 

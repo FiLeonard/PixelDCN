@@ -165,7 +165,7 @@ def ipixel_cl(inputs, out_num, kernel_size, scope, activation_fn=tf.nn.relu,
     conv1 = conv2d(inputs, out_num, kernel_size, scope+'/conv1',
                    stride=2, d_format=d_format)
     dialte1 = dilate_tensor(conv1, axis, (0, 0), scope+'/dialte1')
-    shifted_inputs = shift_tensor(inputs, axis, (1, 1), scope+'/shift1')
+    shifted_inputs = shift_tensor(inputs, axis, 1, 1, scope+'/shift1')
     conv1_concat = tf.concat(
         [shifted_inputs, dialte1], channel_axis, name=scope+'/concat1')
     conv2 = conv2d(inputs, out_num, kernel_size, scope+'/conv2',
