@@ -12,7 +12,7 @@ ipixel_dcl: realizes Input Pixel Convolutional Layer
 """
 
 
-def pixel_dcl(inputs, out_num, kernel_size, scope, activation_fn=tf.nn.relu,
+def pixel_dcl(inputs, out_num, kernel_size, scope, activation_fn=tf.nn.elu,
               d_format='NHWC'):
     """
     inputs: input tensor
@@ -43,7 +43,7 @@ def pixel_dcl(inputs, out_num, kernel_size, scope, activation_fn=tf.nn.relu,
     return outputs
 
 
-def ipixel_dcl3d(inputs, out_num, kernel_size, scope, action='concat', activation_fn=tf.nn.relu):
+def ipixel_dcl3d(inputs, out_num, kernel_size, scope, action='concat', activation_fn=tf.nn.elu):
     """
     inputs: input tensor
     out_num: output channel number
@@ -78,7 +78,7 @@ def ipixel_dcl3d(inputs, out_num, kernel_size, scope, action='concat', activatio
     return outputs
 
 
-def pixel_dcl3d(inputs, out_num, kernel_size, scope, action='concat', activation_fn=tf.nn.relu):
+def pixel_dcl3d(inputs, out_num, kernel_size, scope, action='concat', activation_fn=tf.nn.elu):
     """
     inputs: input tensor
     out_num: output channel number
@@ -119,7 +119,7 @@ def combine(tensors, action, axis, name):
         return tf.add_n(tensors, name=name)
 
 
-def ipixel_dcl(inputs, out_num, kernel_size, scope, activation_fn=tf.nn.relu,
+def ipixel_dcl(inputs, out_num, kernel_size, scope, activation_fn=tf.nn.elu,
                d_format='NHWC'):
     """
     inputs: input tensor
@@ -151,7 +151,7 @@ def ipixel_dcl(inputs, out_num, kernel_size, scope, activation_fn=tf.nn.relu,
     return outputs
 
 
-def ipixel_cl(inputs, out_num, kernel_size, scope, activation_fn=tf.nn.relu,
+def ipixel_cl(inputs, out_num, kernel_size, scope, activation_fn=tf.nn.elu,
               d_format='NHWC'):
     """
     inputs: input tensor

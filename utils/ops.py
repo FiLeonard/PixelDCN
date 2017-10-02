@@ -13,7 +13,7 @@ def pixel_dcl(inputs, out_num, kernel_size, scope, data_type='2D', action='add')
     else:
         outs = pixel_dcn.pixel_dcl3d(inputs, out_num, kernel_size, scope, action, None)
     return tf.contrib.layers.batch_norm(
-        outs, decay=0.9, epsilon=1e-5, activation_fn=tf.nn.relu,
+        outs, decay=0.9, epsilon=1e-5, activation_fn=tf.nn.elu,
         updates_collections=None, scope=scope+'/batch_norm')
 
 
@@ -21,7 +21,7 @@ def ipixel_cl(inputs, out_num, kernel_size, scope, data_type='2D'):
     # only support 2d
     outputs = pixel_dcn.ipixel_cl(inputs, out_num, kernel_size, scope, None)
     return tf.contrib.layers.batch_norm(
-        outputs, decay=0.9, epsilon=1e-5, activation_fn=tf.nn.relu,
+        outputs, decay=0.9, epsilon=1e-5, activation_fn=tf.nn.elu,
         updates_collections=None, scope=scope+'/batch_norm')
 
 
@@ -32,7 +32,7 @@ def ipixel_dcl(inputs, out_num, kernel_size, scope, data_type='2D', action='add'
         outs = pixel_dcn.ipixel_dcl3d(
             inputs, out_num, kernel_size, scope, action, None)
     return tf.contrib.layers.batch_norm(
-        outs, decay=0.9, epsilon=1e-5, activation_fn=tf.nn.relu,
+        outs, decay=0.9, epsilon=1e-5, activation_fn=tf.nn.elu,
         updates_collections=None, scope=scope+'/batch_norm')
 
 
@@ -51,7 +51,7 @@ def conv(inputs, out_num, kernel_size, scope, data_type='2D', norm=True):
             name=scope+'/conv')
     if norm:
         return tf.contrib.layers.batch_norm(
-            outs, decay=0.9, epsilon=1e-5, activation_fn=tf.nn.relu,
+            outs, decay=0.9, epsilon=1e-5, activation_fn=tf.nn.elu,
             updates_collections=None, scope=scope+'/batch_norm')
     else:
         return tf.contrib.layers.batch_norm(
@@ -75,7 +75,7 @@ def deconv(inputs, out_num, kernel_size, scope, data_type='2D', **kws):
         outs = tf.nn.conv3d_transpose(
             inputs, weights, out_shape, (1, 2, 2, 2, 1), name=scope+'/deconv')
     return tf.contrib.layers.batch_norm(
-        outs, decay=0.9, epsilon=1e-5, activation_fn=tf.nn.relu,
+        outs, decay=0.9, epsilon=1e-5, activation_fn=tf.nn.elu,
         updates_collections=None, scope=scope+'/batch_norm')
 
 
